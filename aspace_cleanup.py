@@ -2,35 +2,28 @@
 
 import sys
 import requests
+import secrets
 import json
-import re
-import ConfigParser
 import time
 
 startTime = time.time()
 
-# local config file, contains variables
-configFilePath = 'local_settings.cfg'
-config = ConfigParser.ConfigParser()
-config.read(configFilePath)
+baseURL = secrets.baseURL
+user = secrets.user
+password = secrets.password
 
-# URL parameters dictionary, used to manage common URL patterns
-dictionary = {'baseURL': config.get('ArchivesSpace', 'baseURL'), 'user': config.get('ArchivesSpace', 'user'), 'password': config.get('ArchivesSpace', 'password')}
-baseURL = '{baseURL}'.format(**dictionary)
-
-# authenticates the session
-auth = requests.post('{baseURL}/users/{user}/login?password={password}&expiring=false'.format(**dictionary)).json()
-session = auth['session']
-headers = {'X-ArchivesSpace-Session':session}
+auth = requests.post(baseURL + '/users/'+user+'/login?password='+password).json()
+session = auth["session"]
+headers = {'X-ArchivesSpace-Session':session, 'Content_Type':'application/json'}
 print ('Authenticated with header ' + str(headers))
 
-endpoint = '/repositories/3/resources?all_ids=true'
+endpoint = '/repositories/4/resources?all_ids=true'
 
 ids = requests.get(baseURL + endpoint, headers=headers).json()
 
 records = []
 for id in ids:
-    endpoint = '/repositories/3/resources/'+str(id)
+    endpoint = '/repositories/4/resources/'+str(id)
     output = requests.get(baseURL + endpoint, headers=headers).json()
     if 'finding_aid_status' in output:
         if output['finding_aid_status'] == 'collection-level':
@@ -187,7 +180,7 @@ for id in ids:
     else:
         pass
 
-f=open('collectionlevel1.json', 'w')
+f=open('ua_collectionlevel1.json', 'w')
 json.dump(records, f)
 f.close()
 
