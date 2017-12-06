@@ -21,9 +21,10 @@ def main():
     endpoint = '/repositories/' + str(repo) + '/resources?all_ids=true'
     ids = requests.get(baseURL + endpoint, headers=headers).json()
 
+    #loop through resource records by id
     records = []
-    for id in ids:
-        endpoint = '/repositories/' + str(repo) + '/resources/'+str(id)
+    for i in ids:
+        endpoint = '/repositories/' + str(repo) + '/resources/'+str(i)
         output = requests.get(baseURL + endpoint, headers=headers).json()
         if output['publish'] == True:
             if 'finding_aid_status' in output:
