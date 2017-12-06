@@ -1,2 +1,8 @@
 secrets.py*
 *.json
+reports/
+agents/
+misc_code/
+reports/
+resources/
+__pycache__
