@@ -28,7 +28,8 @@ def main():
         endpoint = '/repositories/' + str(repo) + '/resources/'+str(i)
         output = requests.get(baseURL + endpoint, headers=headers).json()
 
-        #only operate on published collection-level finding aids   
+        #only operate on published collection-level finding aids
+        #take out these three lines and unindent the rest if you want to operate on all finding aids
         if output['publish'] == True:
             if 'finding_aid_status' in output:
                 if output['finding_aid_status'] == 'collection-level':
