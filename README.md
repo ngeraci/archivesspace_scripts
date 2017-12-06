@@ -4,7 +4,7 @@ scripts that interact with the ArchivesSpace API to automate various cleanup and
 
 ## Authentication
 for authentication, create a separate file called `secrets.py` in the following format:
-```
+```secrets.py
 backendurl='your backend URL'
 user='your username'
 password='your password'
