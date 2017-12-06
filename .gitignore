@@ -1,8 +1,11 @@
+#authentication
 secrets.py*
+__pycache__/
+
+#misc output files
 *.json
-reports/
-agents/
+*.tsv
+*.csv
+
+#directory with unfinished stuff
 misc_code/
-reports/
-resources/
-__pycache__
