@@ -65,13 +65,13 @@ def main():
                         #get sorted list with URIs only
                         sortedURIs = [item[2] for item in sorted(subjRecords)]
 
-                        #put sorted URIs back into resource record
-                        for index, n in enumerate(subjects):
-                            n['ref'] = sortedURIs[int(index)]
+                    #put sorted URIs back into resource record
+                    for index, n in enumerate(subjects):
+                        n['ref'] = sortedURIs[int(index)]
 
-                        #post updated resource record to ASpace
-                        records.append(output)               
-                        post = requests.post(baseURL + endpoint, headers=headers, data=json.dumps(output)).json()
+                    #post updated resource record to ASpace
+                    records.append(output)               
+                    post = requests.post(baseURL + endpoint, headers=headers, data=json.dumps(output)).json()
 
 if __name__ == '__main__':
     main()
