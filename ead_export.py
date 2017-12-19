@@ -23,8 +23,6 @@ def exportEAD(repoArg):
     sys.stdout.flush()
 
     #check argument
-    print(repoArg)
-    sys.stdout.flush()
     if repoArg == 3 or repoArg == 4 or repoArg == 5:
         repo = str(repoArg)
     else:
@@ -36,8 +34,6 @@ def exportEAD(repoArg):
 
     #get ids
     ids = requests.get(baseURL + '/repositories/' + repo + '/resources?all_ids=true', headers=headers)
-    print('got ids')
-    sys.stdout.flush()
 
     #export finding aids
     for i in ids.json():
