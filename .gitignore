@@ -6,6 +6,10 @@ __pycache__/
 *.json
 *.tsv
 *.csv
+resources/
+
+#notes
+*.md
 
 #directory with unfinished stuff
 misc_code/
