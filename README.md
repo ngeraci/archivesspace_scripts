@@ -17,5 +17,8 @@ orders collection-level subject headings alphabetically, with topical, geographi
 ### aspace_cleanup.py
 a giant hulking script that does a bunch of different cleanup requested in Dec. 2017 collection-level record update project, including note updates, date normalization, and container summary updates. want to eventually break it into smaller reusable pieces.
 
+### ead_export.py
+bulk export of EAD finding aids
+
 ## Acknowledgements & other resources
 I figured out how to do most of this by looking at similar scripts written by [Lora Woodford](https://github.com/lorawoodford/python_scripts) and at the [Rockefeller Archive Center](https://github.com/RockefellerArchiveCenter/scripts/tree/master/archivesspace).
