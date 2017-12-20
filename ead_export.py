@@ -4,7 +4,6 @@ import requests
 import json
 import secrets
 import sys
-import time
 import codecs
 
 def exportEAD(repoArg):
