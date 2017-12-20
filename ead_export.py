@@ -6,7 +6,6 @@ import secrets
 import sys
 import time
 import codecs
-import argparse
 
 def exportEAD(repoArg):
 
