@@ -28,4 +28,4 @@ I figured out how to do most of this by looking at similar scripts written by [L
 
 ## Stylesheets
 ### stylesheets/aspace_oac.xslt
-transforms EAD from the standard ASpace exporter into (closer) to how we want it formatted for OAC ingest. primarily written with collection-level finding aids (no container list/`<dsc>` element) in mind. called by __postprocess.py__.
+transforms EAD that comes out of the standard ASpace exporter into (closer) to how we want it formatted for OAC ingest. primarily written for collection-level finding aids (no container list). closely based on documentation of a former manual process, contains quite a few UCR-specific pieces, called by __postprocess.py__.
