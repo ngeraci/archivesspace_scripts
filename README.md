@@ -1,6 +1,12 @@
 # ArchivesSpace scripts
 
-scripts that interact with the ArchivesSpace API to automate various cleanup and export tasks. continually under construction//no claims to elegance.
+scripts that interact with the ArchivesSpace API to automate various cleanup and export tasks.
+
+(continually under construction, no claims to elegance)
+
+##Requirements
+* [requests](http://docs.python-requests.org/en/master/)
+* [lxml](http://lxml.de/)
 
 ## Authentication
 for authentication, create a separate file called `secrets.py` in the following format:
