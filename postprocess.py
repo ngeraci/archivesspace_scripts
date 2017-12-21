@@ -11,8 +11,7 @@ repos = ['MS','UA','WRCA']
 
 parser = etree.XMLParser(resolve_entities=False, strip_cdata=False, remove_blank_text=True)
 
-#xslt file must be in the same directory as this script
-xslFilename = 'aspace_oac.xslt'
+xslFilename = 'stylesheets/aspace_oac.xslt'
 
 #loop through each repository's local directory for xml files
 for repo in repos:
