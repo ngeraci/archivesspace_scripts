@@ -28,7 +28,7 @@ def exportEAD(repoArg):
         sys.exit(0)
 
     #exclude any specific ead_ids
-    to_exclude = 'ms091.xml'
+    to_exclude = ['ms091.xml','ua383.xml']
 
     #get ids
     ids = requests.get(baseURL + '/repositories/' + repo + '/resources?all_ids=true', headers=headers)
