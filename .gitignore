@@ -11,5 +11,6 @@ resources/
 #notes
 *.md
 
-#directory with unfinished stuff
+#unfinished stuff
 misc_code/
+*.sh
