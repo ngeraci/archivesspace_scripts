@@ -29,9 +29,5 @@ bulk export of EAD finding aids
 ### postprocess.py
 clean up finding aids after export so that they display how we want them in the [Online Archive of California](http://www.oac.cdlib.org/). mainly uses lxml to call __stylesheets/aspace_oac.xslt__, also does a couple of quick & dirty regex replacements.
 
-## Stylesheets
-### stylesheets/aspace_oac.xslt
-transforms EAD that comes out of the standard ASpace exporter into (closer) to how we want it formatted for OAC ingest. primarily written for collection-level finding aids (no container list). closely based on documentation of a formerly manual process, contains quite a few UCR-specific pieces, called by __postprocess.py__.
-
 ## Acknowledgements & other resources
 I figured out how to do most of this by looking at similar scripts written by [Lora Woodford](https://github.com/lorawoodford/python_scripts) and at the [Rockefeller Archive Center](https://github.com/RockefellerArchiveCenter/scripts/tree/master/archivesspace).
