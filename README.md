@@ -29,5 +29,8 @@ bulk export of EAD finding aids
 ### postprocess.py
 clean up finding aids after export so that they display how we want them in the [Online Archive of California](http://www.oac.cdlib.org/). mainly uses lxml to call __stylesheets/aspace_oac.xslt__, also does a couple of quick & dirty regex replacements.
 
+### iso639b_dict.py
+a tiny function that returns a Python dictionary where English names of languages are the keys and and [ISO 639-2B](https://www.loc.gov/standards/iso639-2/php/code_list.php) codes are the values. imported in __postprocess.py__ for some markup stuff. 
+
 ## Acknowledgements & other resources
 I figured out how to do most of this by looking at similar scripts written by [Lora Woodford](https://github.com/lorawoodford/python_scripts) and at the [Rockefeller Archive Center](https://github.com/RockefellerArchiveCenter/scripts/tree/master/archivesspace).
