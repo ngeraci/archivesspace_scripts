@@ -11,7 +11,7 @@ def process():
 
     basedir = 'C:\\Users\\ngeraci\\Documents\\ead_export\\'
 
-    repos = ['MS']#,'UA','WRCA']
+    repos = ['MS','UA','WRCA']
 
     parser = etree.XMLParser(resolve_entities=False, strip_cdata=False, remove_blank_text=True)
 
@@ -45,6 +45,7 @@ def process():
                                     element.text = element.text.replace(langname, langmarkup, 1)
                             except:
                                 pass
+                                #it would be good to have better error handling here
 
                 #to string for regex operations
                 newXML = str(newXML)
@@ -71,3 +72,5 @@ def process():
                 #print confirmation
                 print(filename,' processed to ',outpath)
                 sys.stdout.flush()
+
+process()
