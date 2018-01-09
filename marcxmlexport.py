@@ -5,6 +5,7 @@ import codecs
 import re
 import csv
 from lxml import etree
+from lxml.builder import E
 
 def marcxmlExport():
     #get login info in secrets.py file
@@ -42,7 +43,7 @@ def marcxmlExport():
 
 def marcxmlProcess(xmlAll):
 #misc text processing needed at beginning
-##make a valid     
+##make valid xml     
     #scrub repeated xml declarations
     xmlAll = xmlAll.replace('<?xml version="1.0" encoding="UTF-8"?>','')
     #add outer tag
@@ -67,21 +68,49 @@ def marcxmlProcess(xmlAll):
     for record in records:
         #loop through datafield tags
         for field in record.getchildren():
-            if field.tag == "{http://www.loc.gov/MARC21/slim}datafield":
-                #store collection number in variable
+            #update leader
+            if field.tag == '{http://www.loc.gov/MARC21/slim}leader':
+                field.text = '00000npcaa2200000Ii 4500'
+            elif field.tag == "{http://www.loc.gov/MARC21/slim}datafield":
+                #store collection number in variable, then remove 852
                 if field.attrib['tag'] == '852':
                     subfield = field.getchildren()
                     collNumber = subfield[2].text
-                #change field 534 to 524, per Yoko
+                    field.getparent().remove(field)
+                #replace 'CURIV' with 'CRU' OCLC code
+                elif field.attrib['tag'] == '040':
+                    subfield = field.getchildren()
+                    for s in subfield:
+                        s.text = s.text.replace('CURIV','CRU')
+                #delete date from 245 and store in variable
+                elif field.attrib['tag'] == '245':
+                    subfield = field.getchildren()
+                    for s in subfield:
+                        if s.attrib['code'] == 'f':
+                            date = s.text
+                            s.getparent().remove(s)
+                    #add 264 following 245
+                    record.insert(record.index(field)+1,
+                        E('datafield',
+                            E('subfield',date,code='c'),
+                            #tagToReplace because having an attribute named 'tag' was throwing an error in this function
+                            ind1='',ind2='0',tagToReplace='264'))
+                #delete 520 for scopecontent
+                elif field.attrib['tag'] == '520' and field.attrib['ind1'] == '2':
+                    field.getparent().remove(field)
+                #change field 534 to 524
                 elif field.attrib['tag'] == '534':
                     field.attrib['tag'] = '524'
                 #remove 555 field
                 elif field.attrib['tag'] == '555':
                     field.getparent().remove(field)
-                #600 and 610 fields with second indicator '7' should be changed to second indicator '0', per Yoko
-                elif field.attrib['ind2'] == '7':
-                    if field.attrib['tag'] == '600' or field.attrib['tag'] == '610':
+                #600, 610, 650 & 651 fields with second indicator '7' should be changed to second indicator '0', and delete subfield 2
+                elif field.attrib['tag'] in ['600','610','650','651']:
                         field.attrib['ind2'] = '0'
+                        subfield = field.getchildren()
+                        for s in subfield:
+                            if s.attrib['code'] == '2':
+                                s.getparent().remove(s)
                 #856
                 elif field.attrib['tag'] == '856':
                     #add subfield u (URL)
@@ -90,7 +119,7 @@ def marcxmlProcess(xmlAll):
                     subfield = field.getchildren()
                     #update subfield 3 (text that precedes URL)
                     subfield[0].attrib['code'] = '3'
-                    subfield[0].text = 'Finding aid'
+                    subfield[0].text = 'Finding aid:'
                     #add URL to subfield U
                     try:
                         subfield[1].text = urlDict[collNumber]
@@ -104,8 +133,9 @@ def marcxmlProcess(xmlAll):
     #address spacing issues caused by ead markup like <emph>
     doubleSpace = re.compile(r'(\S)  (\S)')
     xmlAll = doubleSpace.sub(r'\1 \2',xmlAll)
-    punctWithSpace = re.compile(r' (\.|,|:|>)')
+    punctWithSpace = re.compile(r' (\.|,|:)')
     xmlAll = punctWithSpace.sub(r'\1',xmlAll)
+    xmlAll = xmlAll.replace('> ','>')
 
     #change double paren in 300 field to single
     xmlAll = xmlAll.replace('((','(')
@@ -113,6 +143,9 @@ def marcxmlProcess(xmlAll):
 
     #lowercase 'Linear Feet'
     xmlAll = xmlAll.replace('Linear Feet','linear feet')
+
+    #replace tagToReplace with tag
+    xmlAll = xmlAll.replace('tagToReplace','tag')
 
     #xml declaration
     xmlAll = '<?xml version="1.0" encoding="UTF-8"?>' + xmlAll
