@@ -40,7 +40,7 @@ def marcxmlExport():
     # #to export single record for testing
     # repo = '3'
     # i = '89'
-    marcXML = requests.get(baseURL + '/repositories/'+ repo +'/resources/marc21/'+ i +'.xml', headers=headers)
+    #marcXML = requests.get(baseURL + '/repositories/'+ repo +'/resources/marc21/'+ str(i) +'.xml', headers=headers)
     #append individual record to xmlAll list
     xmlAll.append(marcXML.text)
     xmlAll = ''.join(xmlAll)                    
