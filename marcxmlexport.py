@@ -21,23 +21,30 @@ def marcxmlExport():
     #initialize blank list to hold xml
     xmlAll = []
 
-    for repo in [3,4,5]:
-        #int to string
-        repo = str(repo)
-        #get ids
-        ids = requests.get(baseURL + '/repositories/' + repo + '/resources?all_ids=true', headers=headers)
-        #loop through ids
-        for i in ids.json():
-            resource = (requests.get(baseURL + '/repositories/' + repo + '/resources/' + str(i), headers=headers)).json()
-            #set parameters to export
-            if resource['publish'] == True:
-                if 'finding_aid_status' in resource:
-                    if resource['finding_aid_status'] == 'collection-level':
-                        #get marcxml
-                        marcXML = requests.get(baseURL + '/repositories/'+ repo +'/resources/marc21/'+str(i)+'.xml', headers=headers)
-                        #append individual record to xmlAll list
-                        xmlAll.append(marcXML.text)
+    # for repo in [3,4,5]:
+    #     #int to string
+    #     repo = str(repo)
+    #     #get ids
+    #     ids = requests.get(baseURL + '/repositories/' + repo + '/resources?all_ids=true', headers=headers)
+    #     #loop through ids
+    #     for i in ids.json():
+    #         resource = (requests.get(baseURL + '/repositories/' + repo + '/resources/' + str(i), headers=headers)).json()
+    #         #set parameters to export
+    #         if resource['publish'] == True:
+    #             if 'finding_aid_status' in resource:
+    #                 if resource['finding_aid_status'] == 'collection-level':
+    #                     #get marcxml
+    #                     marcXML = requests.get(baseURL + '/repositories/'+ repo +'/resources/marc21/'+str(i)+'.xml', headers=headers)
+    #                     #append individual record to xmlAll list
+    #                     xmlAll.append(marcXML.text)
 
+
+    #to export single record for testing
+    repo = '3'
+    i = '250'
+    marcXML = requests.get(baseURL + '/repositories/'+ repo +'/resources/marc21/'+ i +'.xml', headers=headers)
+    #append individual record to xmlAll list
+    xmlAll.append(marcXML.text)
     xmlAll = ''.join(xmlAll)                    
     return xmlAll
 
@@ -63,7 +70,6 @@ def marcxmlProcess(xmlAll):
 #lxml processing
     root = etree.XML(xmlAll)
     records = root.xpath("/document/*[namespace-uri()='http://www.loc.gov/MARC21/slim' and local-name()='collection']/*[namespace-uri()='http://www.loc.gov/MARC21/slim' and local-name()='record']")
-
 #   loop through each record
     for record in records:
         #loop through datafield tags
@@ -77,24 +83,73 @@ def marcxmlProcess(xmlAll):
                     subfield = field.getchildren()
                     collNumber = subfield[2].text
                     field.getparent().remove(field)
-                #replace 'CURIV' with 'CRU' OCLC code
                 elif field.attrib['tag'] == '040':
+                    #replace 'CURIV' with 'CRU' OCLC code
                     subfield = field.getchildren()
                     for s in subfield:
                         s.text = s.text.replace('CURIV','CRU')
-                #delete date from 245 and store in variable
+                    #append subfield e 'rda'
+                    field.append(E('subfield','rda',code='e'))
+                #delete dates from 245 and store in variable
                 elif field.attrib['tag'] == '245':
+                    #initialize variables
+                    inclusiveDate = None
+                    bulkDate = None
+                    #get subfields
                     subfield = field.getchildren()
                     for s in subfield:
-                        if s.attrib['code'] == 'f':
-                            date = s.text
+                        if s.attrib['code'] == 'a':
+                            if s.text.endswith('.') == False:
+                                s.text += '.'
+                        elif s.attrib['code'] == 'f':
+                            inclusiveDate = s.text
+                            #if 245 has “undated” in $f, delete it, and add “circa” to the date
+                            if ', undated' in inclusiveDate:
+                                inclusiveDate = 'circa ' + inclusiveDate.replace(', undated','')
                             s.getparent().remove(s)
-                    #add 264 following 245
+                        #subfield g (bulk date) - get value
+                        elif s.attrib['code'] == 'g':
+                            bulkDate = s.text
+                            s.getparent().remove(s)
+                        #format date value
+                        if inclusiveDate is not None and bulkDate is not None:
+                            date = inclusiveDate + ', bulk ' + bulkDate
+                        elif inclusiveDate is None and bulkDate is not None:
+                            date = 'bulk ' + bulkDate
+                        elif inclusiveDate is not None and bulkDate is None:
+                            date = inclusiveDate
+                        else:
+                            continue
+                        if ' - ' in date:
+                            date = date.replace(' - ','-')
+                        if date.endswith('.') == False:
+                            date += '.'
+                   #add 264 following 245
                     record.insert(record.index(field)+1,
                         E('datafield',
                             E('subfield',date,code='c'),
                             #tagToReplace because having an attribute named 'tag' was throwing an error in this function
                             ind1='',ind2='0',tagToReplace='264'))
+                #append additional 3xx fields following 300
+                elif field.attrib['tag'] == '300':
+                    record.insert(record.index(field)+1,
+                        E('datafield',
+                            E('subfield','unspecified',code='a'),
+                            E('subfield','rdacontent',code='2'),
+                            #tagToReplace because having an attribute named 'tag' was throwing an error in this function
+                            ind1='',ind2='',tagToReplace='336'))
+                    record.insert(record.index(field)+2,
+                        E('datafield',
+                            E('subfield','unmediated',code='a'),
+                            E('subfield','rdamedia', code='2'),
+                            #tagToReplace because having an attribute named 'tag' was throwing an error in this function
+                            ind1='',ind2='',tagToReplace='337'))
+                    record.insert(record.index(field)+2,
+                        E('datafield',
+                            E('subfield','unspecified',code='a'),
+                            E('subfield','rdacarrier',code='2'),
+                            #tagToReplace because having an attribute named 'tag' was throwing an error in this function
+                            ind1='',ind2='',tagToReplace='338'))
                 #delete 520 for scopecontent
                 elif field.attrib['tag'] == '520' and field.attrib['ind1'] == '2':
                     field.getparent().remove(field)
@@ -106,11 +161,23 @@ def marcxmlProcess(xmlAll):
                     field.getparent().remove(field)
                 #600, 610, 650 & 651 fields with second indicator '7' should be changed to second indicator '0', and delete subfield 2
                 elif field.attrib['tag'] in ['600','610','650','651']:
-                        field.attrib['ind2'] = '0'
-                        subfield = field.getchildren()
-                        for s in subfield:
-                            if s.attrib['code'] == '2':
-                                s.getparent().remove(s)
+                    field.attrib['ind2'] = '0'
+                    subfield = field.getchildren()
+                    for s in subfield:
+                        if s.attrib['code'] == '2':
+                            s.getparent().remove(s)
+                        elif s.attrib['code'] == 'a':
+                            if s.text.endswith('.') == False:
+                                s.text += '.'
+                #655 period
+                elif field.attrib['tag'] == '655':
+                    subfield = field.getchildren()
+                    for s in subfield:
+                        if s.attrib['code'] == 'a':
+                            if s.text.endswith('.') == False:
+                                print('blergl')
+                                s.text += '.'
+
                 #856
                 elif field.attrib['tag'] == '856':
                     #add subfield u (URL)
