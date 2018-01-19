@@ -74,7 +74,7 @@ def marcxmlProcess(xmlAll):
         for field in record.getchildren():
             #update leader
             if field.tag == '{http://www.loc.gov/MARC21/slim}leader':
-                field.text = '00000npcaa2200000Ii 4500'
+                field.text = '00000npcaa2200000Ic 4500'
             elif field.tag == "{http://www.loc.gov/MARC21/slim}datafield":
                 fieldNumber = field.attrib['tag']
                 #store collection number in variable, then remove 852
@@ -162,12 +162,29 @@ def marcxmlProcess(xmlAll):
                 elif fieldNumber in ['600','610','650','651']:
                     field.attrib['ind2'] = '0'
                     subfield = field.getchildren()
+                    subfieldCodes = []
+                    for s in subfield:
+                        subfieldCodes.append(s.attrib['code'])
                     for s in subfield:
                         if s.attrib['code'] == '2':
                             s.getparent().remove(s)
                         elif s.attrib['code'] == 'a':
-                            if s.text.endswith('.') == False:
+                            if 'z' in subfieldCodes or 'x' in subfieldCodes:
+                                pass
+                            elif 'd' in subfieldCodes:
+                                s.text += ','                           
+                            else:
                                 s.text += '.'
+                        elif s.attrib['code'] == 'x':
+                            #add a period only if it's the last value - in progress
+                            valueIndex = subfieldCodes.index(s.attrib['code'])
+                            maxIndex = max(loc for loc, val in enumerate(subfieldCodes) if val == 'x')
+                            if 'z' not in subfieldCodes:
+                                if valueIndex == maxIndex:
+                                    s.text += '.'
+                        elif s.attrib['code'] == 'z':
+                            s.text += '.'
+
                 #655 period
                 elif fieldNumber == '655':
                     subfield = field.getchildren()
@@ -186,7 +203,9 @@ def marcxmlProcess(xmlAll):
                             #if subfield b exists and A doesn't already have a period, add period
                             if 'b' in subfieldCodes and s.text.endswith('.') == False:
                                 s.text += '.'
-                            #if there's E but no B, and A doesn't end with a hyphen, append comma 
+                            elif 'd' in subfieldCodes:
+                                s.text += ','
+                            #if there's E but no B or D, and A doesn't end with a hyphen, append comma 
                             elif 'e' in subfieldCodes and s.text.endswith('-') == False:
                                 s.text += ','
                         elif s.attrib['code'] == 'b':
@@ -195,6 +214,10 @@ def marcxmlProcess(xmlAll):
                         elif s.attrib['code'] == 'd':
                             if 'e' in subfieldCodes:
                                 s.text += ','
+                            else:
+                                s.text += '.'
+                        elif s.attrib['code'] == 'e':
+                            s.text += '.'
                 #856
                 elif fieldNumber == '856':
                     #add subfield u (URL)
@@ -208,7 +231,8 @@ def marcxmlProcess(xmlAll):
                     try:
                         subfield[1].text = urlDict[collNumber]
                     except:
-                        print(collNumber + ' URL not found')
+                        # print(collNumber + ' URL not found')
+                        pass
 
     #write to string        
     xmlAll = etree.tostring(root, encoding='unicode')
