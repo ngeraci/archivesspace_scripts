@@ -26,7 +26,7 @@
             <addressline>Email: specialcollections@ucr.edu</addressline>
             <addressline>URL: http://library.ucr.edu/libraries/special-collections-university-archives</addressline>
         </address>
-            <date>&#x00A9;2017</date>
+            <xsl:copy-of select="ead:p/ead:date[1]/node()"/>
             <p>The Regents of the University of California. All rights reserved.</p>
         </publicationstmt>
     </xsl:template>
@@ -109,5 +109,10 @@
     <xsl:template match="ead:corpname[.=preceding-sibling::ead:corpname]"/>
     <xsl:template match="ead:famname[.=preceding-sibling::ead:famname]"/>
     <!--remove dsc-->
-    <xsl:template match="ead:dsc"/>
+    <!--<xsl:template match="ead:dsc"/>-->
+    <!--trying a different approach to just remove empty tags (so preserves dsc if not empty-->
+    <xsl:template match=
+        "*[not(@*|*|comment()|processing-instruction()) 
+        and normalize-space()=''
+        ]"/>
 </xsl:stylesheet>
