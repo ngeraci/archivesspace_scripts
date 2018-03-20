@@ -26,7 +26,7 @@
             <addressline>Email: specialcollections@ucr.edu</addressline>
             <addressline>URL: http://library.ucr.edu/libraries/special-collections-university-archives</addressline>
         </address>
-            <date><xsl:copy-of select="ead:p/ead:date[1]/node()"/></date>
+            <date>&#x00A9; <xsl:copy-of select="ead:p/ead:date[1]/node()"/></date>
             <p>The Regents of the University of California. All rights reserved.</p>
         </publicationstmt>
     </xsl:template>
