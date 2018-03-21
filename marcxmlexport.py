@@ -7,7 +7,7 @@ import csv
 from lxml import etree
 from lxml.builder import E
 
-def marcxmlExport(repo):
+def marcxmlExport():
     #get login info in secrets.py file
     baseURL = secrets.baseURL
     user = secrets.user
@@ -21,19 +21,22 @@ def marcxmlExport(repo):
     #initialize blank list to hold xml
     xmlAll = []
 
-    #int to string
-    repo = str(repo)
-    #get ids
-    ids = requests.get(baseURL + '/repositories/' + repo + '/resources?all_ids=true', headers=headers)
-    #loop through ids
-    for i in ids.json():
-        resource = (requests.get(baseURL + '/repositories/' + repo + '/resources/' + str(i), headers=headers)).json()
-        #set parameters to export
-        if resource['publish'] == True:
-            if 'finding_aid_status' in resource:
-                if resource['finding_aid_status'] == 'collection-level':
-                    #get marcxml
-                    marcXML = requests.get(baseURL + '/repositories/'+ repo +'/resources/marc21/'+str(i)+'.xml', headers=headers)
+    for repo in [3,4,5]:
+        #int to string
+        repo = str(repo)
+        #get ids
+        ids = requests.get(baseURL + '/repositories/' + repo + '/resources?all_ids=true', headers=headers)
+        #loop through ids
+        for i in ids.json():
+            resource = (requests.get(baseURL + '/repositories/' + repo + '/resources/' + str(i), headers=headers)).json()
+            #set parameters to export
+            if resource['publish'] == True:
+                if 'finding_aid_status' in resource:
+                    if resource['finding_aid_status'] == 'collection-level':
+                        #get marcxml
+                        marcXML = requests.get(baseURL + '/repositories/'+ repo +'/resources/marc21/'+str(i)+'.xml', headers=headers)
+                        #append individual record to xmlAll list
+                        xmlAll.append(marcXML.text)
     # #to export single record for testing
     # repo = '3'
     # i = '89'
@@ -261,5 +264,4 @@ def marcxmlProcess(xmlAll):
     f.write(xmlAll)
     f.close()                 
 
-for repo in [3,4]:
-    marcxmlProcess(marcxmlExport(repo))
+marcxmlProcess(marcxmlExport())
