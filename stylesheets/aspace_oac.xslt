@@ -87,20 +87,22 @@
             <head>Indexing Terms</head>
             <p>The following terms have been used to index the description of this collection in the
                 library's online public access catalog.</p>
-            <controlaccess>
-                <head>Subjects</head>
-                <xsl:for-each select="ead:famname|ead:persname|ead:corpname">
-                    <xsl:apply-templates select="."/>                    
-                </xsl:for-each>
-                <xsl:for-each select="ead:subject|ead:geogname">
-                    <xsl:apply-templates select="."/>
-                </xsl:for-each>
-            </controlaccess>
-            <xsl:if test="ead:genreform">            
-            <controlaccess>
-                <head>Genres and Forms of Materials</head>
-                <xsl:apply-templates select="ead:genreform"/>
-            </controlaccess>
+            <xsl:if test="ead:famname|ead:persname|ead:corpname|ead:subject|ead:geogname">
+                <controlaccess>
+                    <head>Subjects</head>
+                    <xsl:for-each select="ead:famname|ead:persname|ead:corpname">
+                        <xsl:apply-templates select="."/>
+                    </xsl:for-each>
+                    <xsl:for-each select="ead:subject|ead:geogname">
+                        <xsl:apply-templates select="."/>
+                    </xsl:for-each>
+                </controlaccess>
+            </xsl:if>
+            <xsl:if test="ead:genreform">
+                <controlaccess>
+                    <head>Genres and Forms of Materials</head>
+                    <xsl:apply-templates select="ead:genreform"/>
+                </controlaccess>
             </xsl:if>
         </controlaccess>
     </xsl:template>
@@ -111,8 +113,6 @@
     <!--remove dsc-->
     <!--<xsl:template match="ead:dsc"/>-->
     <!--trying a different approach to just remove empty tags (so preserves dsc if not empty-->
-    <xsl:template match=
-        "*[not(@*|*|comment()|processing-instruction()) 
-        and normalize-space()=''
-        ]"/>
+    <xsl:template match="*[not(@*|*|comment()|processing-instruction())          and
+        normalize-space()=''         ]"/>
 </xsl:stylesheet>
