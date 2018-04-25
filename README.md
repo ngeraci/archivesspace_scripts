@@ -1,8 +1,8 @@
 # ArchivesSpace scripts
 
-scripts that interact with the ArchivesSpace API to automate various cleanup and export tasks.
+a grab bag of scripts I've used with the ArchivesSpace API to automate various cleanup and export tasks. relatively messy, not under active maintenance, mostly shared here in the case they might be helpful reference for other novice archivist/programmers.
 
-(continually under construction, no claims to elegance)
+Currently working on a cleaner, more reusable set of tools for our Special Collections & Digital Initiatives workflows at [UCR Archives Tools](https://github.com/ngeraci/ucr_archivestools).
 
 ## Requirements
 * [requests](http://docs.python-requests.org/en/master/)
